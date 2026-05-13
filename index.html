@@ -437,6 +437,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);bo
       <button class="page-tab" onclick="showAdminTab('api-config',this)">API/DB</button>
       <button class="page-tab" onclick="showAdminTab('betalingen',this)">Betalingen</button>
       <button class="page-tab" onclick="showAdminTab('huisstijl',this)">Huisstijl</button>
+      <button class="page-tab" onclick="showAdminTab('berichtsjabloon',this)">Berichtsjabloon</button>
     </div>
 
     <!-- DEELNEMERS -->
@@ -596,6 +597,63 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);bo
         <button class="btn btn-danger btn-sm" style="margin-top:.5rem" onclick="removeBG()">Achtergrond verwijderen</button>
       </div>
     </div>
+
+    <!-- BERICHTSJABLOON -->
+    <div id="admin-berichtsjabloon" class="tab-content">
+      <div class="alert alert-info" style="font-size:12px">
+        Pas het standaard bevestigingsbericht aan dat verstuurd wordt na goedkeuring van een inschrijving.<br>
+        Beschikbare variabelen: <code style="background:#e8f0fb;padding:1px 5px;border-radius:4px">{{voornaam}}</code>
+        <code style="background:#e8f0fb;padding:1px 5px;border-radius:4px">{{gebruikersnaam}}</code>
+        <code style="background:#e8f0fb;padding:1px 5px;border-radius:4px">{{wachtwoord}}</code>
+        <code style="background:#e8f0fb;padding:1px 5px;border-radius:4px">{{link}}</code>
+        <code style="background:#e8f0fb;padding:1px 5px;border-radius:4px">{{spelers}}</code>
+        <code style="background:#e8f0fb;padding:1px 5px;border-radius:4px">{{inzet}}</code>
+        <code style="background:#e8f0fb;padding:1px 5px;border-radius:4px">{{aantalspelers}}</code>
+      </div>
+
+      <div class="card">
+        <div class="card-title">💳 Betaalgegevens</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+          <div class="form-row" style="margin-bottom:0">
+            <label class="form-label">IBAN rekeningnummer</label>
+            <input type="text" id="sj-iban" placeholder="BE00 0000 0000 0000" oninput="previewSjabloon()">
+          </div>
+          <div class="form-row" style="margin-bottom:0">
+            <label class="form-label">Naam rekeninghouder</label>
+            <input type="text" id="sj-rekeninghouder" placeholder="ZVC Albertsvrienden" oninput="previewSjabloon()">
+          </div>
+        </div>
+        <div class="form-row" style="margin-top:.75rem;margin-bottom:0">
+          <label class="form-label">Mededeling bij betaling</label>
+          <input type="text" id="sj-mededeling" placeholder="WK2026 + jouw naam" oninput="previewSjabloon()">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🖼 QR-code (optioneel)</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:.75rem">
+          Genereer een betaal-QR op <strong>payconiq.be</strong> of <strong>qr-code-generator.com</strong> en upload hem hier. Hij wordt getoond boven het bevestigingsbericht.
+        </div>
+        <input type="file" id="qr-upload" accept="image/*" onchange="uploadQR(this)">
+        <div id="qr-preview" style="margin-top:.75rem"></div>
+        <button class="btn btn-danger btn-sm" style="margin-top:.5rem" onclick="removeQR()">QR-code verwijderen</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">✍ Berichtsjabloon</div>
+        <textarea id="sj-tekst" rows="16" style="font-family:monospace;font-size:12px;line-height:1.6" oninput="previewSjabloon()"></textarea>
+        <div style="display:flex;gap:8px;margin-top:.85rem;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="saveSjabloon()">💾 Sjabloon opslaan</button>
+          <button class="btn" onclick="resetSjabloon()">↩ Standaard herstellen</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">👁 Voorbeeld (met testgegevens)</div>
+        <div id="sj-preview" class="copy-box" style="font-size:12px;line-height:1.6;max-height:320px;overflow-y:auto;white-space:pre-wrap"></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -910,10 +968,131 @@ function rejectRequest(reqId){
   showToast('Aanvraag geweigerd');
 }
 
+// ============================================================
+// BERICHTSJABLOON
+// ============================================================
+const DEFAULT_SJABLOON = `Hallo {{voornaam}},
+
+Je inschrijving voor WK 2026 Pronostiek is goedgekeurd!
+
+🔗 Link: {{link}}
+👤 Gebruikersnaam: {{gebruikersnaam}}
+🔑 Wachtwoord: {{wachtwoord}}
+
+{{spelers}}Vul je pronostiek in vóór 11 juni 2026.
+Inzet: {{inzet}}
+
+💳 Betaling:
+IBAN: {{iban}}
+Naam: {{rekeninghouder}}
+Mededeling: {{mededeling}}
+
+Veel succes! ⚽
+ZVC Albertsvrienden`;
+
+let SJABLOON = DEFAULT_SJABLOON;
+let QR_DATA = null;
+
+function loadSjabloon(){
+  try{
+    const saved=localStorage.getItem('wk26_sjabloon');
+    if(saved) SJABLOON=saved;
+    const iban=localStorage.getItem('wk26_iban')||'';
+    const rh=localStorage.getItem('wk26_rekeninghouder')||'ZVC Albertsvrienden';
+    const med=localStorage.getItem('wk26_mededeling')||'WK2026 + jouw naam';
+    const qr=localStorage.getItem('wk26_qr')||null;
+    if(document.getElementById('sj-iban')) document.getElementById('sj-iban').value=iban;
+    if(document.getElementById('sj-rekeninghouder')) document.getElementById('sj-rekeninghouder').value=rh;
+    if(document.getElementById('sj-mededeling')) document.getElementById('sj-mededeling').value=med;
+    if(document.getElementById('sj-tekst')) document.getElementById('sj-tekst').value=SJABLOON;
+    if(qr){QR_DATA=qr;document.getElementById('qr-preview').innerHTML=`<img src="${qr}" style="max-width:150px;border-radius:8px;border:1px solid var(--border)">`;}
+  }catch(e){}
+  previewSjabloon();
+}
+
+function saveSjabloon(){
+  SJABLOON=document.getElementById('sj-tekst').value;
+  try{
+    localStorage.setItem('wk26_sjabloon',SJABLOON);
+    localStorage.setItem('wk26_iban',document.getElementById('sj-iban').value);
+    localStorage.setItem('wk26_rekeninghouder',document.getElementById('sj-rekeninghouder').value);
+    localStorage.setItem('wk26_mededeling',document.getElementById('sj-mededeling').value);
+  }catch(e){}
+  showToast('✓ Berichtsjabloon opgeslagen');
+  previewSjabloon();
+}
+
+function resetSjabloon(){
+  if(!confirm('Standaard sjabloon herstellen? Jouw aanpassingen gaan verloren.')) return;
+  SJABLOON=DEFAULT_SJABLOON;
+  document.getElementById('sj-tekst').value=SJABLOON;
+  previewSjabloon();
+  showToast('✓ Standaard sjabloon hersteld');
+}
+
+function previewSjabloon(){
+  const el=document.getElementById('sj-preview');
+  if(!el) return;
+  const tekst=document.getElementById('sj-tekst')?.value||SJABLOON;
+  const preview=applyTemplate(tekst,{
+    voornaam:'Jan',
+    gebruikersnaam:'jan_janssen',
+    wachtwoord:'WK2026jan!',
+    link:'https://zvcalbertsvrienden.github.io/WK2026/',
+    spelers:'Je account bevat 2 spelers:\n  Speler 1: Jan Janssen\n  Speler 2: Marie Janssen\n\nNa het inloggen kies je bovenaan de actieve speler.\n',
+    aantalspelers:'2',
+    inzet:'2×15€ = €30',
+    iban:document.getElementById('sj-iban')?.value||'BE00 0000 0000 0000',
+    rekeninghouder:document.getElementById('sj-rekeninghouder')?.value||'ZVC Albertsvrienden',
+    mededeling:document.getElementById('sj-mededeling')?.value||'WK2026 Jan Janssen',
+  });
+  el.textContent=preview;
+}
+
+function applyTemplate(template, vars){
+  let result=template;
+  for(const[key,val]of Object.entries(vars)){
+    result=result.replaceAll(`{{${key}}}`,val||'');
+  }
+  return result;
+}
+
 function buildConfirmMsg(req){
   const url=window.location.href.split('?')[0].replace(/#.*/,'');
-  const playerList=req.players.length>1?req.players.map((p,i)=>`  Speler ${i+1}: ${p}`).join('\n')+'\n':'';
-  return `Hallo ${req.contactFirst},\n\nJe inschrijving voor WK 2026 Pronostiek is goedgekeurd!\n\n🔗 Link: ${url}\n👤 Gebruikersnaam: ${req.username}\n🔑 Wachtwoord: ${req.pw}\n\n${req.players.length>1?`Je account bevat ${req.players.length} spelers:\n${playerList}\nNa het inloggen kies je bovenaan de pagina de actieve speler.\n`:''}Vul je pronostiek in vóór 11 juni 2026.\nInzet: ${req.players.length}×15€ = €${req.players.length*15} — gelieve dit te betalen aan de beheerder.\n\nVeel succes! ⚽\nZVC Albertsvrienden`;
+  const playerList=req.players.length>1
+    ?`Je account bevat ${req.players.length} spelers:\n${req.players.map((p,i)=>`  Speler ${i+1}: ${p}`).join('\n')}\n\nNa het inloggen kies je bovenaan de pagina de actieve speler.\n`
+    :'';
+  const iban=localStorage.getItem('wk26_iban')||'';
+  const rh=localStorage.getItem('wk26_rekeninghouder')||'ZVC Albertsvrienden';
+  const med=localStorage.getItem('wk26_mededeling')||'WK2026 + jouw naam';
+  return applyTemplate(SJABLOON,{
+    voornaam: req.contactFirst,
+    gebruikersnaam: req.username,
+    wachtwoord: req.pw,
+    link: url,
+    spelers: playerList,
+    aantalspelers: String(req.players.length),
+    inzet: `${req.players.length}×15€ = €${req.players.length*15}`,
+    iban, rekeninghouder:rh, mededeling:med,
+  });
+}
+
+function uploadQR(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    QR_DATA=e.target.result;
+    try{localStorage.setItem('wk26_qr',QR_DATA);}catch(ex){}
+    document.getElementById('qr-preview').innerHTML=`<img src="${QR_DATA}" style="max-width:150px;border-radius:8px;border:1px solid var(--border)">`;
+    showToast('✓ QR-code geüpload');
+  };
+  reader.readAsDataURL(file);
+}
+function removeQR(){
+  QR_DATA=null;
+  try{localStorage.removeItem('wk26_qr');}catch(e){}
+  document.getElementById('qr-preview').innerHTML='';
+  showToast('QR-code verwijderd');
 }
 
 function copyConfirm(reqId){
@@ -1813,6 +1992,7 @@ function showAdminTab(id,btn){
   if(id==='uitslagen-admin') renderAdminMatches();
   if(id==='betalingen') renderPayments();
   if(id==='nieuws') renderNewsList();
+  if(id==='berichtsjabloon'){loadSjabloon();}
 }
 function showUitTab(id,btn){
   document.querySelectorAll('#admin-uitslagen-admin .page-tab').forEach(b=>b.classList.remove('active'));
@@ -1844,6 +2024,9 @@ window.addEventListener('load',()=>{
     const sbUrl=localStorage.getItem('wk26_sb_url');if(sbUrl&&document.getElementById('sb-url')) document.getElementById('sb-url').value=sbUrl;
     const sbKey=localStorage.getItem('wk26_sb_key');if(sbKey&&document.getElementById('sb-key')) document.getElementById('sb-key').value=sbKey;
     const apiKey=localStorage.getItem('wk26_api_key');if(apiKey&&document.getElementById('api-key')) document.getElementById('api-key').value=apiKey;
+    // Load sjabloon settings
+    const savedSj=localStorage.getItem('wk26_sjabloon');if(savedSj) SJABLOON=savedSj;
+    const savedQr=localStorage.getItem('wk26_qr');if(savedQr) QR_DATA=savedQr;
   }catch(e){}
   // Auto-open register mode if ?register=1 in URL
   const params=new URLSearchParams(window.location.search);

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WK 2026 Pronostiek — Handleiding</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#fff;color:#111;font-size:13px;line-height:1.6}
+
+/* PRINT */
+@media print{
+  .no-print{display:none!important}
+  .page-break{page-break-before:always}
+  body{font-size:12px}
+}
+
+/* LAYOUT */
+.doc{max-width:800px;margin:0 auto;padding:2rem}
+
+/* COVER */
+.cover{background:linear-gradient(135deg,#0A2E1A 0%,#0f3d23 100%);color:#fff;border-radius:16px;padding:2.5rem 2rem;margin-bottom:2rem;text-align:center;position:relative;overflow:hidden}
+.cover-emoji{font-size:64px;margin-bottom:.75rem}
+.cover-title{font-size:28px;font-weight:900;color:#fff;margin-bottom:.25rem}
+.cover-subtitle{font-size:14px;color:rgba(255,255,255,.6);margin-bottom:1.5rem}
+.cover-badge{display:inline-block;background:#C9A227;color:#0A2E1A;font-size:11px;font-weight:800;padding:4px 16px;border-radius:20px;letter-spacing:.06em}
+.cover-deco{position:absolute;right:-20px;top:-20px;font-size:120px;opacity:.06}
+
+/* SECTION */
+.section{margin-bottom:2rem}
+.section-title{font-size:16px;font-weight:800;color:#0A2E1A;margin-bottom:.75rem;padding-bottom:.4rem;border-bottom:2px solid #C9A227;display:flex;align-items:center;gap:8px}
+.section-title .icon{font-size:18px}
+
+/* STEPS */
+.steps{display:flex;flex-direction:column;gap:1rem}
+.step{display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:start}
+.step-num{width:36px;height:36px;border-radius:50%;background:#0A2E1A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0}
+.step-body{padding-top:6px}
+.step-title{font-size:13px;font-weight:700;margin-bottom:3px;color:#111}
+.step-desc{font-size:12px;color:#555;line-height:1.55}
+.step-desc strong{color:#0A2E1A}
+.step-desc code{background:#f0f2f5;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:11px}
+
+/* SCREEN MOCKUP */
+.mockup{background:#f8f9fa;border:1px solid #e0e0e0;border-radius:12px;padding:1rem;margin:.75rem 0}
+.mockup-bar{background:#0A2E1A;border-radius:6px 6px 0 0;padding:.4rem .75rem;margin:-1rem -1rem .75rem;display:flex;align-items:center;gap:6px}
+.mockup-dot{width:8px;height:8px;border-radius:50%}
+.mockup-title{color:rgba(255,255,255,.7);font-size:10px;font-weight:700;letter-spacing:.05em;flex:1;text-align:center}
+.mockup-nav{display:flex;gap:2px;background:#0A2E1A;border-radius:6px;padding:3px;margin-bottom:.75rem;overflow-x:auto}
+.mockup-tab{padding:4px 10px;font-size:10px;font-weight:600;color:rgba(255,255,255,.55);border-radius:4px;white-space:nowrap}
+.mockup-tab.active{background:#C9A227;color:#0A2E1A}
+.mockup-match{background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:.6rem .75rem;margin-bottom:.4rem}
+.mockup-match-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
+.mockup-match-meta{font-size:9px;color:#999}
+.mockup-match-body{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:.4rem}
+.mockup-team{display:flex;flex-direction:column;align-items:center;gap:2px}
+.mockup-flag{font-size:18px}
+.mockup-name{font-size:9px;font-weight:700;text-align:center}
+.mockup-inputs{display:flex;align-items:center;gap:4px}
+.mockup-input{width:28px;height:28px;background:#f0f2f5;border:1px solid #ddd;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#185FA5}
+.mockup-dash{font-size:12px;color:#ccc}
+.mockup-badge{font-size:9px;padding:1px 6px;border-radius:4px;font-weight:700}
+.badge-info{background:#E6F1FB;color:#185FA5}
+.badge-success{background:#EAF3DE;color:#3B6D11}
+.badge-pts{background:#185FA5;color:#fff}
+
+/* POINTS TABLE */
+.pts-table{width:100%;border-collapse:collapse;font-size:12px;margin:.5rem 0}
+.pts-table th{background:#0A2E1A;color:#fff;padding:6px 10px;text-align:left;font-weight:700}
+.pts-table td{padding:6px 10px;border-bottom:1px solid #f0f0f0}
+.pts-table tr:last-child td{border-bottom:none;background:#fff9e6;font-weight:700}
+.pts-highlight{color:#185FA5;font-weight:800}
+
+/* MULTIPLIER */
+.mult-row{display:flex;gap:8px;margin:.5rem 0;flex-wrap:wrap}
+.mult-chip{flex:1;min-width:80px;border-radius:8px;padding:8px;text-align:center}
+.mc-g{background:#EAF3DE;color:#3B6D11}
+.mc-r{background:#E6F1FB;color:#185FA5}
+.mc-q{background:#FAEEDA;color:#854F0B}
+.mc-s{background:#FCF0FC;color:#7B2D8B}
+.mc-f{background:#FCEBEB;color:#A32D2D}
+.mult-val{font-size:20px;font-weight:900}
+.mult-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+
+/* TIPS */
+.tip{background:#FFF9E6;border-left:3px solid #C9A227;border-radius:0 8px 8px 0;padding:.6rem .85rem;margin:.5rem 0;font-size:12px}
+.tip strong{color:#854F0B}
+
+.warning{background:#FCEBEB;border-left:3px solid #A32D2D;border-radius:0 8px 8px 0;padding:.6rem .85rem;margin:.5rem 0;font-size:12px}
+.warning strong{color:#A32D2D}
+
+/* FAQ */
+.faq{display:flex;flex-direction:column;gap:.75rem}
+.faq-item{background:#f8f9fa;border-radius:8px;padding:.75rem 1rem}
+.faq-q{font-weight:700;font-size:12px;color:#0A2E1A;margin-bottom:.25rem}
+.faq-a{font-size:12px;color:#555}
+
+/* FOOTER */
+.footer{text-align:center;font-size:11px;color:#aaa;margin-top:2rem;padding-top:1rem;border-top:1px solid #f0f0f0}
+
+/* PRIZE */
+.prize-row{display:flex;gap:8px;margin:.5rem 0}
+.prize-card{flex:1;border-radius:8px;padding:.75rem;text-align:center}
+.pc-g{background:#FFF4CC;border:2px solid #C9A227}
+.pc-s{background:#f8f9fa;border:1px solid #ddd}
+.pc-b{background:#f8f9fa;border:1px solid #ddd}
+.prize-emoji{font-size:20px;margin-bottom:3px}
+.prize-pct{font-size:18px;font-weight:900;color:#0A2E1A}
+.prize-lbl{font-size:10px;color:#666;line-height:1.3;margin-top:2px}
+
+.print-btn{position:fixed;top:1rem;right:1rem;background:#0A2E1A;color:#fff;border:none;padding:.5rem 1.25rem;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.print-btn:hover{background:#0f3d23}
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">🖨 Afdrukken / PDF</button>
+
+<div class="doc">
+
+  <!-- COVER -->
+  <div class="cover">
+    <div class="cover-deco">⚽</div>
+    <div class="cover-emoji">⚽</div>
+    <div class="cover-title">WK 2026 Pronostiek</div>
+    <div class="cover-subtitle">ZVC Albertsvrienden · Canada &amp; VS &amp; Mexico · 11 juni – 19 juli 2026</div>
+    <div class="cover-badge">HANDLEIDING VOOR DEELNEMERS</div>
+  </div>
+
+  <!-- INLEIDING -->
+  <div class="section">
+    <div class="section-title"><span class="icon">👋</span> Welkom</div>
+    <p style="font-size:13px;color:#444;margin-bottom:.75rem">
+      Welkom bij de WK 2026 pronostiekcompetitie van ZVC Albertsvrienden! In deze handleiding leggen we stap voor stap uit hoe je de tool gebruikt, hoe je punten scoort en hoe de prijzen verdeeld worden.
+    </p>
+    <div class="tip"><strong>Link naar de tool:</strong> ZVCalbertsvrienden.github.io/WK2026</div>
+  </div>
+
+  <!-- STAP 1: INLOGGEN -->
+  <div class="section">
+    <div class="section-title"><span class="icon">🔐</span> Stap 1 — Inloggen</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Ga naar de tool</div>
+          <div class="step-desc">Open je browser en ga naar <code>ZVCalbertsvrienden.github.io/WK2026</code>. Je kan de link ook scannen via de QR-code op de flyer.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Lees de spelregels &amp; vink akkoord aan</div>
+          <div class="step-desc">Bovenaan zie je de volledige spelregels. Lees ze door en vink het vakje <strong>"Ik ga akkoord"</strong> aan. Het loginformulier wordt dan actief.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Vul je inloggegevens in</div>
+          <div class="step-desc">Je hebt je <strong>gebruikersnaam</strong> en <strong>wachtwoord</strong> ontvangen via WhatsApp of e-mail van de beheerder. Vul ze in en klik <strong>"Aanmelden"</strong>.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mockup" style="margin-top:.75rem">
+      <div class="mockup-bar">
+        <div class="mockup-dot" style="background:#ff5f57"></div>
+        <div class="mockup-dot" style="background:#ffbd2e"></div>
+        <div class="mockup-dot" style="background:#28c840"></div>
+        <div class="mockup-title">WK 2026 PRONOSTIEK — AANMELDEN</div>
+      </div>
+      <div style="max-width:280px;margin:0 auto">
+        <div style="text-align:center;font-size:32px;margin-bottom:.4rem">⚽</div>
+        <div style="text-align:center;font-size:14px;font-weight:800;color:#0A2E1A;margin-bottom:.1rem">WK 2026 Pronostiek</div>
+        <div style="text-align:center;font-size:10px;color:#999;margin-bottom:.85rem">ZVC Albertsvrienden</div>
+        <div style="background:#f0f2f5;border-radius:8px;padding:.6rem;margin-bottom:.4rem;font-size:11px;color:#555;line-height:1.4">
+          ☑ Ik heb de spelregels gelezen en ga akkoord.
+        </div>
+        <div style="margin-bottom:.4rem">
+          <div style="font-size:10px;font-weight:700;color:#666;margin-bottom:2px">Gebruikersnaam</div>
+          <div style="background:#fff;border:1px solid #185FA5;border-radius:6px;padding:5px 8px;font-size:11px;color:#111">jan_janssen</div>
+        </div>
+        <div style="margin-bottom:.6rem">
+          <div style="font-size:10px;font-weight:700;color:#666;margin-bottom:2px">Wachtwoord</div>
+          <div style="background:#fff;border:1px solid #ddd;border-radius:6px;padding:5px 8px;font-size:11px;color:#999">••••••••••</div>
+        </div>
+        <div style="background:#0A2E1A;color:#fff;text-align:center;border-radius:6px;padding:6px;font-size:11px;font-weight:700">Aanmelden</div>
+      </div>
+    </div>
+
+    <div class="tip"><strong>Tip:</strong> Sla je gebruikersnaam op in je browser zodat je niet elke keer opnieuw moet typen.</div>
+    <div class="tip"><strong>Familie-account:</strong> Als meerdere familieleden meedoen onder één account, kies je na het inloggen de juiste speler via de knoppen bovenaan de pronostiek-pagina.</div>
+  </div>
+
+  <!-- STAP 2: PRONOSTIEK -->
+  <div class="section page-break">
+    <div class="section-title"><span class="icon">📝</span> Stap 2 — Pronostiek invullen</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Ga naar "Mijn pronostiek"</div>
+          <div class="step-desc">Klik bovenaan op het tabblad <strong>"Mijn pronostiek"</strong>. Je ziet alle 48 groepswedstrijden chronologisch gesorteerd op datum.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Vul de scores in</div>
+          <div class="step-desc">Voor elke wedstrijd zie je twee invoervakjes — één voor de thuisploeg (links) en één voor de uitploeg (rechts). Vul je verwachte score in. <strong>0-0 is ook een geldige score!</strong></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Vergeet niet op te slaan!</div>
+          <div class="step-desc">Klik op de knop <strong>"💾 Opslaan"</strong> rechtsboven om je pronostiek te bewaren. Je kan altijd terugkomen om scores te wijzigen — zolang de wedstrijd nog niet begonnen is.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Schiftingsvragen invullen</div>
+          <div class="step-desc">Bovenaan de pronostiek-pagina staan 2 schiftingsvragen. Die worden gebruikt bij gelijke stand. Vul ze zeker in!</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mockup">
+      <div class="mockup-bar">
+        <div class="mockup-dot" style="background:#ff5f57"></div>
+        <div class="mockup-dot" style="background:#ffbd2e"></div>
+        <div class="mockup-dot" style="background:#28c840"></div>
+        <div class="mockup-title">MIJN PRONOSTIEK</div>
+      </div>
+      <div class="mockup-nav">
+        <div class="mockup-tab active">Pronostiek</div>
+        <div class="mockup-tab">Knock-out</div>
+        <div class="mockup-tab">Ranglijst</div>
+        <div class="mockup-tab">Uitslagen</div>
+      </div>
+      <div style="font-size:9px;font-weight:800;color:#666;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem">11 juni</div>
+      <div class="mockup-match">
+        <div class="mockup-match-header">
+          <span class="mockup-match-meta">Match 1 · Gr.A · 18:00 · Mexico-Stad</span>
+          <span class="mockup-badge badge-info">Komend</span>
+        </div>
+        <div class="mockup-match-body">
+          <div class="mockup-team"><div class="mockup-flag">🇲🇽</div><div class="mockup-name">Mexico</div></div>
+          <div class="mockup-inputs">
+            <div class="mockup-input">2</div>
+            <div class="mockup-dash">—</div>
+            <div class="mockup-input">1</div>
+          </div>
+          <div class="mockup-team"><div class="mockup-flag">🇿🇦</div><div class="mockup-name">Zuid-Afrika</div></div>
+        </div>
+      </div>
+      <div class="mockup-match">
+        <div class="mockup-match-header">
+          <span class="mockup-match-meta">Match 2 · Gr.A · 21:00 · Guadalajara</span>
+          <span class="mockup-badge badge-success">✓ 0–0</span>
+        </div>
+        <div class="mockup-match-body">
+          <div class="mockup-team"><div class="mockup-flag">🇰🇷</div><div class="mockup-name">Zuid-Korea</div></div>
+          <div class="mockup-inputs">
+            <div class="mockup-input" style="background:#eee;color:#999">0</div>
+            <div class="mockup-dash">—</div>
+            <div class="mockup-input" style="background:#eee;color:#999">0</div>
+          </div>
+          <div class="mockup-team"><div class="mockup-flag">🇨🇿</div><div class="mockup-name">Tsjechië</div></div>
+        </div>
+      </div>
+      <div style="text-align:right;margin-top:.5rem">
+        <div style="display:inline-block;background:#0A2E1A;color:#fff;font-size:10px;font-weight:700;padding:5px 12px;border-radius:6px">💾 Opslaan</div>
+      </div>
+    </div>
+
+    <div class="warning"><strong>Let op:</strong> Wedstrijden die al gespeeld zijn kan je niet meer wijzigen. De invoervakjes zijn dan grijs en geblokkeerd.</div>
+    <div class="tip"><strong>Tip:</strong> Vul je volledige pronostiek in vóór <strong>11 juni 2026</strong> — de eerste wedstrijd bepaalt de deadline!</div>
+  </div>
+
+  <!-- PUNTENSYSTEEM -->
+  <div class="section">
+    <div class="section-title"><span class="icon">🎯</span> Puntensysteem</div>
+    <p style="font-size:12px;color:#555;margin-bottom:.75rem">Per wedstrijd kan je maximaal 6 punten verdienen:</p>
+
+    <table class="pts-table">
+      <thead><tr><th>Wat voorspel je correct?</th><th>Punten</th></tr></thead>
+      <tbody>
+        <tr><td>Juist toto (winnaar of gelijkspel)</td><td class="pts-highlight">2 punten</td></tr>
+        <tr><td>Juist aantal doelpunten thuisploeg</td><td class="pts-highlight">1 punt</td></tr>
+        <tr><td>Juist aantal doelpunten uitploeg</td><td class="pts-highlight">1 punt</td></tr>
+        <tr><td>Exacte score (beide teams correct) — bonus</td><td class="pts-highlight">+2 punten</td></tr>
+        <tr><td><strong>Maximum per wedstrijd</strong></td><td class="pts-highlight">6 punten</td></tr>
+      </tbody>
+    </table>
+
+    <div style="margin:.85rem 0">
+      <div style="font-size:12px;font-weight:700;margin-bottom:.4rem">Voorbeeld: eindstand Mexico – Zuid-Afrika = 2–1</div>
+      <table class="pts-table">
+        <thead><tr><th>Jouw gok</th><th>Uitleg</th><th>Punten</th></tr></thead>
+        <tbody>
+          <tr><td>0–0</td><td>Juist gelijkspel voorspeld</td><td class="pts-highlight">2p</td></tr>
+          <tr><td>2–0</td><td>Juist winnaar + juist thuis (2)</td><td class="pts-highlight">3p</td></tr>
+          <tr><td>1–1</td><td>Juist gelijkspel — maar uitslag is 2-1</td><td class="pts-highlight">2p</td></tr>
+          <tr><td>2–1</td><td>Exacte score! Winnaar + thuis + uit + bonus</td><td class="pts-highlight">6p</td></tr>
+          <tr><td>3–2</td><td>Juist winnaar voorspeld</td><td class="pts-highlight">2p</td></tr>
+          <tr><td>0–1</td><td>Juist aantal voor uitploeg (1)</td><td class="pts-highlight">1p</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="font-size:12px;font-weight:700;margin:.75rem 0 .4rem">Puntenmultipliers in de knock-outfase</div>
+    <p style="font-size:12px;color:#555;margin-bottom:.4rem">In de knock-outfase worden je punten vermenigvuldigd:</p>
+    <div class="mult-row">
+      <div class="mult-chip mc-g"><div class="mult-val">×1</div><div class="mult-lbl">Groepsfase</div></div>
+      <div class="mult-chip mc-r"><div class="mult-val">×2</div><div class="mult-lbl">R32 &amp; R16</div></div>
+      <div class="mult-chip mc-q"><div class="mult-val">×3</div><div class="mult-lbl">Kwartfinale</div></div>
+      <div class="mult-chip mc-s"><div class="mult-val">×4</div><div class="mult-lbl">Halve finale</div></div>
+      <div class="mult-chip mc-f"><div class="mult-val">×5</div><div class="mult-lbl">Finale</div></div>
+    </div>
+    <div class="tip"><strong>Tip:</strong> Een correcte exacte score in de finale levert 6 × 5 = <strong>30 punten</strong> op!</div>
+  </div>
+
+  <!-- KNOCK-OUT -->
+  <div class="section page-break">
+    <div class="section-title"><span class="icon">🏆</span> Knock-out fase</div>
+    <p style="font-size:12px;color:#555;margin-bottom:.75rem">Na de poulefase gaan de beste teams door naar de knock-outfase. De beheerder schakelt deze fase vrij zodra alle groepswedstrijden gespeeld zijn.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Ga naar "Knock-out"</div>
+          <div class="step-desc">Klik bovenaan op het tabblad <strong>"Knock-out"</strong>. Je ziet alle knock-out wedstrijden van de Ronde van 32 tot de Finale.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Teams worden automatisch ingevuld</div>
+          <div class="step-desc">Zodra de beheerder de knock-outfase vrijschakelt, verschijnen de teams automatisch. Je kan dan pas scores invullen.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Eindstand na 90 minuten telt</div>
+          <div class="step-desc">Ook in de knock-outfase telt enkel de stand na 90 minuten. <strong>Gelijkspel is een geldige voorspelling</strong> — verlengingen en strafschoppen tellen niet mee.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RANGLIJST -->
+  <div class="section">
+    <div class="section-title"><span class="icon">📊</span> Ranglijst &amp; standen</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">①</div>
+        <div class="step-body">
+          <div class="step-title">Ranglijst</div>
+          <div class="step-desc">Klik op <strong>"Ranglijst"</strong> om de actuele stand te bekijken. Je ziet je eigen score gemarkeerd. Je kan filteren op totaal, poulefase of knock-out.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">②</div>
+        <div class="step-body">
+          <div class="step-title">Groepsstanden</div>
+          <div class="step-desc">Klik op <strong>"Standen"</strong> voor de actuele WK-groepsstanden met punten, doelpuntensaldo en doorgeplaatste teams.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">③</div>
+        <div class="step-body">
+          <div class="step-title">Uitslagen</div>
+          <div class="step-desc">Klik op <strong>"Uitslagen"</strong> voor een overzicht van alle gespeelde en komende wedstrijden.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRIJZEN -->
+  <div class="section">
+    <div class="section-title"><span class="icon">💰</span> Inzet &amp; prijzen</div>
+    <div class="tip" style="margin-bottom:.75rem"><strong>Inzet per speler: 15€</strong> — 10€ gaat naar de clubkas van ZVC Albertsvrienden, 5€ naar de prijzenpot.</div>
+
+    <div class="prize-row">
+      <div class="prize-card pc-g">
+        <div class="prize-emoji">🥇</div>
+        <div class="prize-pct">50%</div>
+        <div class="prize-lbl">Hoogste totaalscore na de finale</div>
+      </div>
+      <div class="prize-card pc-s">
+        <div class="prize-emoji">🥈</div>
+        <div class="prize-pct">30%</div>
+        <div class="prize-lbl">2e hoogste totaalscore na de finale</div>
+      </div>
+      <div class="prize-card pc-b">
+        <div class="prize-emoji">🥉</div>
+        <div class="prize-pct">20%</div>
+        <div class="prize-lbl">Leider groepsfase-ranglijst (gegarandeerd!)</div>
+      </div>
+    </div>
+
+    <div class="tip" style="margin-top:.75rem"><strong>Speciale garantie:</strong> De speler met de meeste punten na de 48 groepswedstrijden krijgt <strong>gegarandeerd</strong> de 3e prijs — ook als hij/zij later in de knock-outfase lager eindigt!</div>
+    <div class="tip"><strong>Bij ex-aequo</strong> beslissen de schiftingsvragen. Daarna loting.</div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section page-break">
+    <div class="section-title"><span class="icon">❓</span> Veelgestelde vragen</div>
+    <div class="faq">
+      <div class="faq-item">
+        <div class="faq-q">Kan ik mijn pronostiek nog wijzigen na het opslaan?</div>
+        <div class="faq-a">Ja, zolang een wedstrijd nog niet begonnen is. Eens de uitslag ingevoerd is, zijn de vakjes geblokkeerd.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Wat als ik vergeet op te slaan?</div>
+        <div class="faq-a">Niet opgeslagen scores gaan verloren. Klik altijd op "💾 Opslaan" na het invullen!</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Welke eindstand telt — ook bij verlengingen?</div>
+        <div class="faq-a">Nee! Alleen de stand na 90 minuten + blessuretijd telt. Verlengingen en strafschoppen tellen niet mee.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Ons gezin heeft meerdere spelers — hoe werkt dat?</div>
+        <div class="faq-a">Na het inloggen zie je bovenaan de pagina knoppen met de namen van alle spelers op jullie account. Klik op een naam om de actieve speler te wisselen. Elke speler heeft een aparte pronostiek.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Ik ben mijn wachtwoord vergeten — wat nu?</div>
+        <div class="faq-a">Neem contact op met de beheerder via WhatsApp of e-mail. Hij kan je wachtwoord opnieuw instellen.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Wanneer moet ik mijn pronostiek invullen?</div>
+        <div class="faq-a">Vul je volledige pronostiek in vóór 11 juni 2026 (start WK). Je kan ook later nog invullen voor wedstrijden die nog niet gespeeld zijn.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Hoe betaal ik de inzet?</div>
+        <div class="faq-a">De beheerder neemt contact met je op voor de betaling. Je ontvangt de betaalgegevens in het bevestigingsbericht.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div style="font-size:16px;margin-bottom:.4rem">⚽ WK 2026 Pronostiek · ZVC Albertsvrienden</div>
+    <div>Canada &amp; VS &amp; Mexico · 11 juni – 19 juli 2026</div>
+    <div style="margin-top:.25rem">Vragen? Contacteer de beheerder via WhatsApp of e-mail</div>
+  </div>
+
+</div>
+
+</body>
+</html>
